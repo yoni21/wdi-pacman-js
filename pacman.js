@@ -1,7 +1,7 @@
-// Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var powerPellets = 4;
+var dots = 240;
 
 // Define your ghosts here
 var inky = {
@@ -34,13 +34,11 @@ var clyde = {
   colour: 'Orange',
   character: 'Pokey',
   edible: false
-};
+}
 
 
-// replace this comment with your four ghosts setup as objects
+var ghosts = [inky, blinky, pinky, clyde];
 
-
-// Draw the screen functionality
 function drawScreen() {
   clearScreen();
   setTimeout(function() {
@@ -56,12 +54,50 @@ function clearScreen() {
 
 function displayStats() {
   console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Power-Pellets: ' + powerPellets);
+  console.log('Dots: ' + dots);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
-  console.log('(d) Eat Dot');
+  if (dots > 0) {
+    console.log('(d) Eat Dot');
+  } else {
+    console.log('');
+  }
+  if (dots > 10) {
+    console.log('(t) Eat Ten Dots');
+  } else {
+    console.log('');
+  }
+  if (dots > 100) {
+    console.log('(c) Eat One Hundred Dots');
+  } else {
+    console.log('');
+  }
+  if (dots > 0) {
+    console.log('(a) Eat All Dots');
+  } else {
+    console.log('');
+  }
+  if (powerPellets > 0) {
+    console.log('(p) Eat Power-Pellet');
+  } else {
+    console.log('');
+  }
+
+
+
+  for (var step = 0; step < ghosts.length; step++) {
+    if (ghosts[step].edible) {
+      console.log('(' + ghosts[step].menu_option + ') Eat ' + ghosts[step].name + ' (edible)');
+    } else {
+      console.log('(' + ghosts[step].menu_option + ') Eat ' + ghosts[step].name + ' (inedible)');
+    }
+  }
+
   console.log('(q) Quit');
+
 }
 
 function displayPrompt() {
@@ -74,6 +110,49 @@ function displayPrompt() {
 function eatDot() {
   console.log('\nChomp!');
   score += 10;
+  dots--;
+}
+
+function eatTenDots() {
+  console.log('\nChomp Chomp Chomp Chomp Chomp!!');
+  score += 100;
+  dots -= 10;
+}
+
+function eatCentiDots() {
+  console.log('\nChomp Chomp Chomp Chomp Chomp Chomp Chomp Chomp Chomp Chomp Chomp!!!');
+  score += 1000;
+  dots -= 100;
+}
+
+function eatAllDots() {
+  console.log('\nI\'m full!!!');
+  score += 100000;
+  dots -= dots;
+}
+
+function eatGhost(ghost) {
+  if (ghost.edible) {
+    score += 200;
+    console.log('\nYou ate ' + ghost.name + ' and that ghost is a ' + ghost.character + ' ghost!')
+    ghost.edible = false;
+  } else {
+    lives--;
+    console.log('\nThe ' + ghost.colour + ' ghost with a name of ' + ghost.name + ' just killed you!')
+  }
+}
+function gameOver() {
+  if (lives < 0) {
+    process.exit();
+  }
+}
+
+function eatPowerPellet() {
+  score += 50;
+  powerPellets--;
+  for (var step = 0; step < ghosts.length; step++) {
+    ghosts[step].edible = true;
+  }
 }
 
 
@@ -85,13 +164,62 @@ function processInput(key) {
       process.exit();
       break;
     case 'd':
-      eatDot();
+      if (dots > 0) {
+        eatDot();
+        break;
+      } else {
+        console.log('\nNo dots left');
+        break;
+      }
+    case 't':
+      if (dots > 10) {
+        eatTenDots();
+        break;
+      } else {
+        console.log('\nNot enough dots left');
+        break;
+      }
+    case 'c':
+      if (dots > 100) {
+        eatCentiDots();
+        break;
+      } else {
+        console.log('\nNot enough dots left');
+        break;
+      }
+    case 'a':
+      if (dots > 0) {
+        eatAllDots();
+        break;
+      } else {
+        console.log('\nNo dots left');
+        break;
+      }
+    case '1':
+      eatGhost(inky);
       break;
+    case '2':
+      eatGhost(blinky);
+      break;
+    case '3':
+      eatGhost(pinky);
+      break;
+    case '4':
+      eatGhost(clyde);
+      break;
+    case 'p':
+      if (powerPellets > 0) {
+        eatPowerPellet();
+        break;
+      } else {
+        console.log('\nNo Power-Pellets left!');
+        break;
+      }
     default:
       console.log('\nInvalid Command!');
   }
+  gameOver();
 }
-
 
 //
 // YOU PROBABLY DON'T WANT TO CHANGE CODE BELOW THIS LINE
